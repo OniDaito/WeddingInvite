@@ -1,3 +1,11 @@
+/**
+* @brief The main WeddingInvite Program
+* @file invite.c
+* @author Benjamin Blundell <oni@section9.co.uk>
+* @date 21/11/2016
+*
+*/
+
 #include <avr/io.h>
 #define F_CPU 8000000
 #include <util/delay.h>
@@ -21,8 +29,6 @@
 
 #define WAIT_INNER (F_CPU / 6000)
 
-
-
 /** Wait for a time
 *
 * @param millis number of miliseconds
@@ -38,8 +44,6 @@ void wait(uint16_t millis) {
  	}
 }
 
-
-
 /** Send a command byte to the LCD
 *
 * @param cmd the command byte to send.
@@ -50,6 +54,9 @@ void lcdCommand(uint8_t cmd) {
   // Send the data
   sspiOutMSB(LCD_SCK, LCD_MOSI, cmd, 8);
 }
+
+/** Initialize the LCD
+*/
 
 
 void lcdInit() {
@@ -100,6 +107,15 @@ void lcdClear(bool invert) {
 	}
 }
 
+
+/** Print a character
+*
+* @param row 0 to 81
+* @param col 0 to 5
+* @param ch the actual character (see smallfont.h)
+* @param invert white on black or black on white
+*/
+
 void lcdPrintChar(uint8_t row, uint8_t col, char ch, bool invert) {
 	// Make sure it is on the screen
   if((row>=LCD_ROW)||(col>=LCD_COL)) {
@@ -125,6 +141,14 @@ void lcdPrintChar(uint8_t row, uint8_t col, char ch, bool invert) {
     lcdData(invert?0xFF:0x00);
 	} 
 }
+
+/** Print a string
+*
+* @param row 0 to 81
+* @param col 0 to 5
+* @param str the actual characters (see smallfont.h)
+* @param invert white on black or black on white
+*/
 
 void lcdPrint(uint8_t row, uint8_t col, const char *str, bool invert){
   for(;(*str!='\0')&&(col<LCD_COL);col+=CHAR_WIDTH,str++){
@@ -174,6 +198,16 @@ void lcdImageP(uint8_t row, uint8_t col, const uint8_t *img, bool invert) {
 	}
 }
 
+/** Display an image on the screen
+*
+* I found the above image function problematic. This 
+* function ASSUMES 82 x 48 SIZE IMAGE. It fills the 
+* entire screen but is simpler and works.
+*
+* @param img a pointer to the image
+* @param invert white on black or black on white
+*/
+
 void lcdImageB(const uint8_t * img, bool invert) {
  	lcdCommand(0x80);
   lcdCommand(0x40);
@@ -184,15 +218,18 @@ void lcdImageB(const uint8_t * img, bool invert) {
 	}
 }
 
+/** Main entry function */
+
 int main(void) {
-   
+
+  // Init and clear  
   lcdInit();
   lcdClear(true);
   wait(100);
 	lcdClear(false);
   wait(100);
 
-
+  // First loading title
   lcdImageB(IMAGE_TITLE,true);
   wait(1000);
  

@@ -1,3 +1,11 @@
+/**
+* @brief A really basic test program 
+* @file test.c
+* @author Benjamin Blundell <oni@section9.co.uk>
+* @date 21/11/2016
+*
+*/
+
 #include <avr/io.h>
 #define F_CPU 120000
 #include <util/delay.h>
